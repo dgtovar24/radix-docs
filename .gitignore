@@ -1,0 +1,6 @@
+radix-api/
+radix-web/
+.DS_Store
+*.log
+.idea/
+.vscode/

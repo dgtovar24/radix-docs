@@ -1,0 +1,208 @@
+# Diagramas del Proyecto RADIX
+
+Este documento contiene el diagrama de navegación y el diagrama de casos de uso del proyecto Radix.
+
+## 1. Diagrama de Navegación
+
+El siguiente diagrama muestra el flujo de navegación entre las diferentes secciones del sistema.
+
+```mermaid
+graph TD
+    Login[Pantalla de Login] --> Dashboard[Monitoreo en Vivo / Resumen]
+    
+    subgraph Sidebar ["Barra de Navegación Lateral"]
+        Dashboard
+        Pacientes[Gestión de Pacientes]
+        Tratamientos[Historial de Tratamientos]
+        Ajustes[Ajustes del Sistema]
+    end
+
+    Dashboard <--> Pacientes
+    Dashboard <--> Tratamientos
+    Dashboard <--> Ajustes
+    
+    Pacientes <--> Tratamientos
+    Pacientes <--> Ajustes
+    
+    Tratamientos <--> Ajustes
+
+    Ajustes --> Logout[Cerrar Sesión]
+    Logout --> Login
+```
+
+---
+
+## 2. Diagrama de Casos de Uso
+
+Este diagrama describe las interacciones principales que los profesionales médicos realizan con el sistema.
+
+```mermaid
+useCaseDiagram
+    actor "Facultativo / Administrador" as User
+
+    package RADIX {
+        usecase "Autenticarse en el sistema" as UC1
+        usecase "Monitorear pacientes en tiempo real" as UC2
+        usecase "Gestionar Pacientes" as UC3
+        usecase "Añadir nuevo paciente" as UC3a
+        usecase "Ver alertas de seguridad" as UC3b
+        usecase "Gestionar Tratamientos" as UC4
+        usecase "Registrar nuevo tratamiento" as UC4a
+        usecase "Exportar historial (CSV)" as UC4b
+        usecase "Configurar el Sistema" as UC5
+        usecase "Editar perfil profesional" as UC5a
+        usecase "Vincular dispositivos médicos" as UC5b
+        usecase "Gestionar alertas y notificaciones" as UC5c
+    }
+
+    User --> UC1
+    User --> UC2
+    User --> UC3
+    User --> UC4
+    User --> UC5
+
+    UC3 <|-- UC3a
+    UC3 <|-- UC3b
+    
+    UC4 <|-- UC4a
+    UC4 <|-- UC4b
+    
+    UC5 <|-- UC5a
+    UC5 <|-- UC5b
+    UC5 <|-- UC5c
+```
+
+> [!NOTE]
+> El sistema está diseñado principalmente para facultativos (médicos, radiólogos) y administradores de la clínica, permitiendo un control total sobre el monitoreo de isótopos y la seguridad del paciente.
+
+---
+
+## 3. Diagrama de Dependencias API — Frontend vs Backend
+
+Este diagrama muestra qué componentes del frontend dependen de qué endpoints del backend, identificando los controladores existentes (✓) y los faltantes (✗).
+
+```mermaid
+graph TB
+    subgraph "Frontend — Páginas y Componentes"
+        DASH[Dashboard]
+        PAC[Pacientes]
+        TRAT[Tratamientos]
+        ALT[Alertas]
+        USR[Usuarios]
+        FAC[Facultativos]
+        PW[PatientRegistration<br/>Wizard 4 pasos]
+        UW[UserRegistration<br/>Wizard 3-4 pasos]
+        PD[PatientDetails<br/>gráficos simulados]
+        DW[DashboardWidgets<br/>mock data]
+        DL[DashboardLayout<br/>Chat + Rix]
+    end
+
+    subgraph "Backend — Controladores Existentes"
+        AUTH[Auth ✓ 4 ep]
+        PAT[Patients ⚠️ 4 ep]
+        USRC[Users ⚠️ 2 ep]
+        TRTC[Treatments ✓ 6 ep]
+        ALTC[Alerts ✓ 4 ep]
+        WTC[Watch ✓ 3 ep]
+        ISOC[Isotopes ✓ 2 ep]
+        DSHC[Dashboard ✓ 1 ep]
+    end
+
+    subgraph "Backend — Controladores Faltantes ✗"
+        SW[Smartwatch ✗]
+        DOC[Doctor Profile ✗]
+        HLM[Health Metrics ✗]
+        RAD[Radiation Logs ✗]
+        MSG[Messages ✗]
+        GAME[Game Sessions ✗]
+        SET[Settings ✗]
+    end
+
+    DASH --> DW --> DSHC
+    DASH --> DW --> HLM
+    DASH --> DW --> RAD
+    PAC --> PAT
+    PAC --> PD --> PAT
+    PD --> HLM
+    PD --> RAD
+    PD --> MSG
+    TRAT --> TRTC
+    TRAT --> ISOC
+    ALT --> ALTC
+    USR --> USRC
+    USR --> UW --> USRC
+    USR --> UW --> DOC
+    FAC --> USRC
+    PW --> SW
+    DL --> MSG
+
+    style SW fill:#ef4444,color:#fff
+    style DOC fill:#ef4444,color:#fff
+    style HLM fill:#ef4444,color:#fff
+    style RAD fill:#ef4444,color:#fff
+    style MSG fill:#ef4444,color:#fff
+    style GAME fill:#ef4444,color:#fff
+    style SET fill:#ef4444,color:#fff
+    style PAT fill:#f59e0b,color:#fff
+    style USRC fill:#f59e0b,color:#fff
+```
+
+---
+
+## 4. Diagrama de Entidades sin API
+
+Muestra las 9 entidades JPA que tienen tabla en base de datos y repositorio pero ningún endpoint REST.
+
+```mermaid
+graph LR
+    subgraph "Entidades CON API"
+        AUTH_E[User]
+        PAT_E[Patient]
+        TRT_E[Treatment]
+        ALT_E[DoctorAlert]
+        ISO_E[IsotopeCatalog]
+    end
+
+    subgraph "Entidades SIN API ✗"
+        SW_E[Smartwatch]
+        HM_E[HealthMetrics]
+        HL_E[HealthLog]
+        RL_E[RadiationLog]
+        MM_E[MotivationalMessage]
+        GS_E[GameSession]
+        ST_E[Settings]
+        UN_E[Unit]
+        OA_E[OAuthClient]
+    end
+
+    PAT_E --> TRT_E
+    PAT_E --> SW_E
+    PAT_E --> HM_E
+    PAT_E --> HL_E
+    PAT_E --> RL_E
+    PAT_E --> MM_E
+    PAT_E --> GS_E
+    PAT_E --> ST_E
+    TRT_E --> HM_E
+    TRT_E --> RL_E
+    TRT_E --> ALT_E
+    TRT_E --> ISO_E
+    TRT_E --> SW_E
+    TRT_E --> UN_E
+    AUTH_E --> OA_E
+
+    style SW_E fill:#ef4444,color:#fff
+    style HM_E fill:#ef4444,color:#fff
+    style HL_E fill:#ef4444,color:#fff
+    style RL_E fill:#ef4444,color:#fff
+    style MM_E fill:#ef4444,color:#fff
+    style GS_E fill:#ef4444,color:#fff
+    style ST_E fill:#ef4444,color:#fff
+    style UN_E fill:#ef4444,color:#fff
+    style OA_E fill:#ef4444,color:#fff
+    style AUTH_E fill:#3b82f6,color:#fff
+    style PAT_E fill:#3b82f6,color:#fff
+    style TRT_E fill:#3b82f6,color:#fff
+    style ALT_E fill:#3b82f6,color:#fff
+    style ISO_E fill:#3b82f6,color:#fff
+```
