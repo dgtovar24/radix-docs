@@ -1,0 +1,39 @@
+name: Dependencies Matrix
+description: Matriz de dependencias entre módulos del ecosistema Radix
+filters:
+  and:
+    - file.hasTag("frontend") or file.hasTag("backend") or file.hasTag("mobile")
+
+formulas:
+  dependency_count: '0'
+
+properties:
+  file.name:
+    displayName: Module
+  module:
+    displayName: Name
+  depends_on:
+    displayName: Depends On
+  provides_api:
+    displayName: Provides API
+  consumes_api:
+    displayName: Consumes API
+
+views:
+  - type: table
+    name: Dependencies
+    order:
+      - file.name
+      - module
+      - depends_on
+      - provides_api
+      - consumes_api
+
+  - type: list
+    name: API Providers
+    filters:
+      and:
+        - 'provides_api != ""'
+    order:
+      - file.name
+      - provides_api

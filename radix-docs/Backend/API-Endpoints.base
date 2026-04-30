@@ -1,0 +1,47 @@
+name: API Endpoints
+description: Base de datos de todos los endpoints del API de Radix
+filters:
+  and:
+    - file.hasTag("api")
+
+formulas:
+  status_code: 'if(status_code >= 200 && status_code < 300, "success", if(status_code >= 400, "error", "redirect"))'
+
+properties:
+  file.name:
+    displayName: Endpoint File
+  method:
+    displayName: Method
+  path:
+    displayName: Path
+  description:
+    displayName: Description
+  auth_required:
+    displayName: Auth
+  controller:
+    displayName: Controller
+  status_code:
+    displayName: Status Code
+  formula.status_code:
+    displayName: Status Type
+
+views:
+  - type: table
+    name: All Endpoints
+    order:
+      - file.name
+      - method
+      - path
+      - description
+      - auth_required
+      - controller
+
+  - type: cards
+    name: By Method
+    groupBy:
+      property: method
+      direction: ASC
+    order:
+      - path
+      - description
+      - auth_required

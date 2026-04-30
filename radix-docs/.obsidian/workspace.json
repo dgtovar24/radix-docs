@@ -1,0 +1,225 @@
+{
+  "main": {
+    "id": "a199f18873a9facd",
+    "type": "split",
+    "children": [
+      {
+        "id": "c3cc32c33e74d7b8",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "60e855ff0dd3389a",
+            "type": "leaf",
+            "state": {
+              "type": "markdown",
+              "state": {
+                "file": "Backend/API-Overview.md",
+                "mode": "source",
+                "source": false
+              },
+              "icon": "lucide-file",
+              "title": "API-Overview"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "vertical"
+  },
+  "left": {
+    "id": "2b13689951d20dea",
+    "type": "split",
+    "children": [
+      {
+        "id": "379d63aaadae558b",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "02d556c3d9ea3041",
+            "type": "leaf",
+            "state": {
+              "type": "file-explorer",
+              "state": {
+                "sortOrder": "alphabetical",
+                "autoReveal": false
+              },
+              "icon": "lucide-folder-closed",
+              "title": "Explorador de archivos"
+            }
+          },
+          {
+            "id": "6e094fc8ea4e98de",
+            "type": "leaf",
+            "state": {
+              "type": "search",
+              "state": {
+                "query": "",
+                "matchingCase": false,
+                "explainSearch": false,
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical"
+              },
+              "icon": "lucide-search",
+              "title": "Buscar"
+            }
+          },
+          {
+            "id": "dae6b79596764707",
+            "type": "leaf",
+            "state": {
+              "type": "bookmarks",
+              "state": {},
+              "icon": "lucide-bookmark",
+              "title": "Marcadores"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300
+  },
+  "right": {
+    "id": "0c83b22d4072faa7",
+    "type": "split",
+    "children": [
+      {
+        "id": "a13ab60c3d750a2e",
+        "type": "tabs",
+        "children": [
+          {
+            "id": "db19c1c8cc8603c2",
+            "type": "leaf",
+            "state": {
+              "type": "backlink",
+              "state": {
+                "file": "Backend/API-Overview.md",
+                "collapseAll": false,
+                "extraContext": false,
+                "sortOrder": "alphabetical",
+                "showSearch": false,
+                "searchQuery": "",
+                "backlinkCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-coming-in",
+              "title": "Enlaces entrantes de API-Overview"
+            }
+          },
+          {
+            "id": "6ac679b11c39f176",
+            "type": "leaf",
+            "state": {
+              "type": "outgoing-link",
+              "state": {
+                "file": "Backend/API-Overview.md",
+                "linksCollapsed": false,
+                "unlinkedCollapsed": true
+              },
+              "icon": "links-going-out",
+              "title": "Enlaces salientes de API-Overview"
+            }
+          },
+          {
+            "id": "763cad3f06c4a55b",
+            "type": "leaf",
+            "state": {
+              "type": "tag",
+              "state": {
+                "sortOrder": "frequency",
+                "useHierarchy": true,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-tags",
+              "title": "Etiquetas"
+            }
+          },
+          {
+            "id": "adc21d5374f65788",
+            "type": "leaf",
+            "state": {
+              "type": "all-properties",
+              "state": {
+                "sortOrder": "frequency",
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-archive",
+              "title": "Todas las propiedades"
+            }
+          },
+          {
+            "id": "07278c752c496c3a",
+            "type": "leaf",
+            "state": {
+              "type": "outline",
+              "state": {
+                "file": "Backend/API-Overview.md",
+                "followCursor": false,
+                "showSearch": false,
+                "searchQuery": ""
+              },
+              "icon": "lucide-list",
+              "title": "Esquema de API-Overview"
+            }
+          }
+        ]
+      }
+    ],
+    "direction": "horizontal",
+    "width": 300,
+    "collapsed": true
+  },
+  "left-ribbon": {
+    "hiddenItems": {
+      "switcher:Abrir selector rápido": false,
+      "graph:Abrir vista gráfica": false,
+      "canvas:Crear nuevo lienzo": false,
+      "daily-notes:Abrir la nota de hoy": false,
+      "templates:Insertar plantilla": false,
+      "command-palette:Abrir paleta de comandos": false,
+      "bases:Crear nueva base": false
+    }
+  },
+  "active": "60e855ff0dd3389a",
+  "lastOpenFiles": [
+    "Backend/WebSocket-Alerts.md",
+    "Backend/Watch-Data-Ingestion.md",
+    "Backend/Treatment-Endpoints.md",
+    "Frontend/Theme-System.md",
+    "Backend/Database-Schema.md",
+    "Frontend/Pages-Deep-Dive.md",
+    "Backend/API-Controllers.md",
+    "Backend/API-Authentication.md",
+    "Frontend/Dashboard-Deep-Dive.md",
+    "Frontend/Deep-Dive",
+    "Frontend/Authentication.md",
+    "Inicio.md",
+    "Docker-Development.md",
+    "Backend/API-Testing.md",
+    "Development-Setup.md",
+    "Backend/API-Overview.md",
+    "Arquitectura/Arquitectura.md",
+    "Dependencies-Matrix.base",
+    "Modules-Status.base",
+    "API-Endpoints.base",
+    "Reloj/Reloj-Overview.md",
+    "Movil/iOS-Overview.md",
+    "Movil/AcessFamiliar.md",
+    "Movil/Android-Overview.md",
+    "Frontend/Tech-Stack.md",
+    "Frontend/Components.md",
+    "Frontend/Pages.md",
+    "Frontend/Frontend-Overview.md",
+    "Backend/Configuration.md",
+    "Backend/Tech-Stack.md",
+    "Backend/Endpoints",
+    "Backend/API-Endpoints.base",
+    "Reloj",
+    "Movil",
+    "Frontend",
+    "Backend"
+  ]
+}

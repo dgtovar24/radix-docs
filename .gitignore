@@ -1,6 +1,23 @@
 radix-api/
 radix-web/
+radix-ios/
+radix_app/
+radix_reloj/
+node_modules/
+.agents/
+.augment/
+.claude/
+.codebuddy/
+.commandcode/
+.continue/
+.cortex/
+.crush/
+.factory/
+.goose/
+.junie/
 .DS_Store
 *.log
 .idea/
 .vscode/
+rixSaludando-removebg-preview.png
+Presentacio Rellotge_Intel.ligent_compressed.pdf

@@ -1,0 +1,59 @@
+name: API Endpoints Database
+description: Base de datos de todos los endpoints del API de Radix
+filters:
+  and:
+    - file.hasTag("api")
+
+formulas:
+  path_level: 'path.split("/").length()'
+  method_order: 'if(method == "GET", 1, if(method == "POST", 2, if(method == "PUT", 3, 4)))'
+
+properties:
+  file.name:
+    displayName: File
+  method:
+    displayName: Method
+  path:
+    displayName: Path
+  description:
+    displayName: Description
+  auth_required:
+    displayName: Auth
+  controller:
+    displayName: Controller
+  status_code:
+    displayName: Status
+  formula.path_level:
+    displayName: Depth
+  formula.method_order:
+    displayName: Order
+
+views:
+  - type: table
+    name: All Endpoints
+    order:
+      - file.name
+      - method
+      - path
+      - description
+      - auth_required
+
+  - type: table
+    name: By Method
+    groupBy:
+      property: method
+      direction: ASC
+    order:
+      - path
+      - description
+      - auth_required
+      - controller
+
+  - type: list
+    name: Auth Required
+    filters:
+      and:
+        - 'auth_required == "true"'
+    order:
+      - method
+      - path

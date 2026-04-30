@@ -1,0 +1,39 @@
+name: Project Modules Status
+description: Estado y documentación de todos los módulos del monorepo Radix
+filters:
+  and:
+    - file.hasTag("module") or file.hasTag("overview")
+
+formulas:
+  docs_count: 'file.links.length'
+
+properties:
+  file.name:
+    displayName: Module
+  module:
+    displayName: Module Name
+  status:
+    displayName: Status
+  tech_stack:
+    displayName: Tech Stack
+  api_version:
+    displayName: API Version
+  formula.docs_count:
+    displayName: Links
+
+views:
+  - type: cards
+    name: All Modules
+    order:
+      - file.name
+      - module
+      - status
+      - tech_stack
+
+  - type: table
+    name: Module Status
+    order:
+      - file.name
+      - status
+      - tech_stack
+      - api_version
