@@ -11,16 +11,25 @@
 | Área | Endpoints | Controlador |
 |------|-----------|-------------|
 | Auth | 4 | `AuthController.java` |
-| Patients | 4 | `PatientController.java` |
-| Users | 2 | `UserController.java` |
+| Patients | 6 | `PatientController.java` |
+| Users | 5 | `UserController.java` |
+| Doctors | 3 | `DoctorController.java` |
+| Smartwatches | 6 | `SmartwatchController.java` |
 | Treatments | 6 | `TreatmentController.java` |
 | Alerts | 4 | `DoctorAlertController.java` |
-| Watch/Smartwatch | 3 | `WatchDataController.java` |
+| Watch/Smartwatch Data | 3 | `WatchDataController.java` |
+| Health Metrics | 7 | `HealthMetricsController.java` |
+| Messages | 3 | `MessageController.java` |
+| Game Sessions | 2 | `GameController.java` |
+| Settings | 2 | `SettingsController.java` |
 | Isotopes | 2 | `IsotopeController.java` |
+| Units | 2 | `UnitController.java` |
+| OAuth Clients | 2 | `OAuthClientController.java` |
 | Dashboard | 1 | `DashboardController.java` |
 | System | 2 | `HealthController`, `DocsController` |
-| WebSocket | 1 | `WebSocketConfig.java` |
-| **Total REST** | **29** | |
+| WebSocket | 3 | `WebSocketConfig.java` |
+| **Total REST** | **64** | |
+| **Total WS** | **3** | |
 
 ---
 
@@ -563,18 +572,270 @@ Conexión WebSocket para recibir alertas en tiempo real.
 
 ---
 
+### `WS /ws/chat`
+Chat interno entre facultativos.
+
+**Protocolo:** `ws://` (dev) / `wss://` (production)
+
+**Mensaje enviado (JSON):**
+```json
+{
+  "from": "Carlos López",
+  "text": "He actualizado la ficha de aislamiento."
+}
+```
+
+**Mensaje recibido (JSON):**
+```json
+{
+  "type": "message",
+  "from": "Carlos López",
+  "text": "He actualizado la ficha de aislamiento.",
+  "timestamp": "2024-03-16T10:15:00"
+}
+```
+
+**Controlador:** `ChatWebSocketHandler.java`
+
+---
+
+### `WS /ws/rix`
+Asistente Rix AI para consultas clínicas.
+
+**Mensaje enviado (JSON):**
+```json
+{
+  "text": "Resume las alertas pendientes del turno"
+}
+```
+
+**Mensaje recibido (JSON):**
+```json
+{
+  "type": "response",
+  "text": "Rix ha recibido tu consulta: \"Resume las alertas pendientes del turno\". Conectando con el contexto clínico...",
+  "timestamp": "2024-03-16T10:15:00"
+}
+```
+
+**Controlador:** `RixWebSocketHandler.java`
+
+---
+
+## 11. Smartwatches — `SmartwatchController.java`
+
+### `POST /v2/api/smartwatches`
+Vincular un smartwatch a un paciente.
+
+**Request Body:**
+```json
+{
+  "fkPatientId": 101,
+  "imei": "35928108492011",
+  "macAddress": "00:1B:44:11:3A:B7",
+  "model": "RadixWatch Pro v2"
+}
+```
+
+**Response `201`:**
+```json
+{
+  "id": 3,
+  "imei": "35928108492011",
+  "macAddress": "00:1B:44:11:3A:B7",
+  "model": "RadixWatch Pro v2",
+  "isActive": true,
+  "patientId": 101,
+  "patientName": "María González"
+}
+```
+
+### `GET /v2/api/smartwatches`
+Lista todos los smartwatches.
+
+### `GET /v2/api/smartwatches/{id}`
+Detalle de un smartwatch.
+
+### `GET /v2/api/smartwatches/patient/{patientId}`
+Smartwatches vinculados a un paciente.
+
+### `PUT /v2/api/smartwatches/{id}`
+Actualizar datos del dispositivo.
+
+### `DELETE /v2/api/smartwatches/{id}`
+Desactivar smartwatch.
+
+**Servicio:** `SmartwatchService.java`
+
+---
+
+## 12. Doctors — `DoctorController.java`
+
+### `GET /v2/api/doctors`
+Lista doctores con datos profesionales.
+
+**Response:**
+```json
+[
+  {
+    "id": 5,
+    "firstName": "Carlos",
+    "lastName": "López",
+    "email": "carlos@clinica.es",
+    "phone": "+34 600 000 000",
+    "role": "Doctor",
+    "licenseNumber": "282865432",
+    "specialty": "Medicina Nuclear",
+    "createdAt": "2024-01-15T10:30:00"
+  }
+]
+```
+
+### `GET /v2/api/doctors/{id}`
+Perfil de doctor por ID.
+
+### `PUT /v2/api/doctors/{id}`
+Actualizar datos profesionales.
+
+---
+
+## 13. Health Metrics — `HealthMetricsController.java`
+
+### `GET /v2/api/health-metrics/patient/{patientId}?days=7`
+Métricas de salud del paciente: BPM, pasos, distancia, radiación.
+
+### `GET /v2/api/health-metrics/patient/{patientId}/latest`
+Última métrica registrada del paciente.
+
+### `GET /v2/api/health-metrics/treatment/{treatmentId}`
+Métricas por tratamiento.
+
+### `POST /v2/api/health-metrics`
+Ingesta batch de métricas.
+
+**Request Body:**
+```json
+{
+  "fkPatientId": 101,
+  "fkTreatmentId": 1,
+  "bpm": 72,
+  "steps": 4500,
+  "distance": 3.2,
+  "currentRadiation": 12.5
+}
+```
+
+### `GET /v2/api/health-logs/patient/{patientId}?days=30`
+Logs de salud sin procesar.
+
+### `GET /v2/api/radiation-logs/patient/{patientId}?days=7`
+Historial de radiación del paciente.
+
+### `GET /v2/api/radiation-logs/treatment/{treatmentId}`
+Radiación por tratamiento.
+
+**Servicio:** `HealthMetricsService.java`
+
+---
+
+## 14. Messages — `MessageController.java`
+
+### `GET /v2/api/messages/patient/{patientId}`
+Mensajes de un paciente.
+
+### `POST /v2/api/messages`
+Enviar mensaje a un paciente.
+
+**Request Body:**
+```json
+{
+  "fkPatientId": 101,
+  "messageText": "Recuerda tu cita de control mañana a las 10:00."
+}
+```
+
+### `PUT /v2/api/messages/{id}/read`
+Marcar mensaje como leído.
+
+---
+
+## 15. Game Sessions — `GameController.java`
+
+### `GET /v2/api/games/patient/{patientId}`
+Sesiones de juego del paciente.
+
+### `POST /v2/api/games`
+Registrar sesión de juego.
+
+---
+
+## 16. Settings — `SettingsController.java`
+
+### `GET /v2/api/settings/patient/{patientId}`
+Preferencias del paciente.
+
+### `PUT /v2/api/settings/patient/{patientId}`
+Actualizar preferencias (unitPreference, theme, notificationsEnabled).
+
+---
+
+## 17. Units — `UnitController.java`
+
+### `GET /v2/api/units`
+Catálogo de unidades de medida.
+
+### `GET /v2/api/units/{id}`
+Una unidad.
+
+---
+
+## 18. OAuth Clients — `OAuthClientController.java`
+
+### `GET /v2/api/oauth-clients`
+Listar clientes OAuth.
+
+### `POST /v2/api/oauth-clients`
+Crear nuevo cliente OAuth.
+
+---
+
+## Users — Endpoints nuevos
+
+### `GET /v2/api/users/{id}`
+Obtener usuario por ID.
+
+### `PUT /v2/api/users/{id}`
+Actualizar datos de usuario (firstName, lastName, email, phone, licenseNumber, specialty, role).
+
+### `DELETE /v2/api/users/{id}`
+Eliminar usuario.
+
+---
+
+## Patients — Endpoints nuevos
+
+### `PUT /v2/api/patients/{id}`
+Actualizar datos del paciente (phone, address, familyAccessCode, isActive).
+
+### `DELETE /v2/api/patients/{id}`
+Desactivar paciente (soft delete).
+
+**Response:** `PatientResponse` ahora incluye `phone`, `address`, `isActive`, `familyAccessCode`, `fkUserId`, `fkDoctorId`, `createdAt`.
+
+---
+
 ## Notas de Implementación
 
-1. **PatientController incompleto:** Solo devuelve `{id, fullName}`. El frontend (`PatientList.tsx`) espera `phone`, `address`, `isActive`, `familyAccessCode`, `createdAt`. El modelo `Patient.java` tiene estos campos pero el controlador no los expone.
+1. **PatientResponse ampliado:** Ahora incluye todos los campos del modelo: `phone`, `address`, `isActive`, `familyAccessCode`, `fkUserId`, `fkDoctorId`, `createdAt`.
 
-2. **Campos inexistentes en frontend:** `PatientDetails.tsx:157` referencia `patient.birthDate` pero el modelo `Patient` no tiene ese campo.
+2. **User model extendido:** Añadidos `phone`, `licenseNumber` y `specialty` para soportar el `UserRegistrationWizard`.
 
 3. **AlertRepository duplicado:** `AlertRepository` y `DoctorAlertRepository` apuntan ambos a `DoctorAlert`. Solo `DoctorAlertRepository` se usa en producción.
 
-4. **Campos de doctor:** `UserRegistrationWizard.tsx` recoge `colegiadoNumber` y `specialty` que no existen en el modelo `User` ni en el backend.
+4. **Campos de doctor:** `licenseNumber` y `specialty` ahora existen en el modelo `User`. El `DoctorController` los expone.
 
-5. **apiScheme.json desactualizado:** Solo documenta 7 endpoints. Ver archivo corregido en `radix-web/apiScheme.json`.
+5. **apiScheme.json actualizado:** Documenta los 64 endpoints REST + 3 WebSocket.
 
-6. **Dockerfile HEALTHCHECK:** Usa `/v1/actuator/health` pero el context-path es `/v2`.
+6. **35 endpoints implementados:** De los 35 endpoints faltantes identificados en `MISSING_ENDPOINTS.md`, todos han sido implementados en las Fases 1-5.
 
-7. **Entidades sin controlador:** `HealthLog`, `RadiationLog`, `GameSession`, `MotivationalMessage`, `Settings`, `Unit`, `Smartwatch` — tienen modelo JPA + repositorio pero **cero endpoints HTTP**. Ver `MISSING_ENDPOINTS.md`.
+7. **Entidades con API:** Todas las 14 entidades JPA tienen ahora al menos un endpoint REST.

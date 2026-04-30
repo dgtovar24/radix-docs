@@ -30,7 +30,7 @@ npm run preview                     # preview production build
 `server.servlet.context-path=/v2` — all backend endpoints are under `/v2`.
 Frontend calls `https://api.raddix.pro/v2` (dev: `http://localhost:8080/v2`).
 
-## Complete Endpoint Inventory (29 REST + 1 WebSocket)
+## Complete Endpoint Inventory (64 REST + 3 WebSocket)
 
 ### Auth — `AuthController.java`
 | Method | Path | Description |
@@ -100,12 +100,89 @@ Frontend calls `https://api.raddix.pro/v2` (dev: `http://localhost:8080/v2`).
 | GET | `/v2/` | Health check + API metadata |
 | GET | `/v2/docs` | Self-documenting API schema |
 | WS | `/ws/alerts` | Real-time alert push via WebSocket |
+| WS | `/ws/chat` | Internal chat between doctors |
+| WS | `/ws/rix` | Rix AI clinical assistant |
+
+### Smartwatches — `SmartwatchController.java`
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/v2/api/smartwatches` | Link smartwatch to patient |
+| GET | `/v2/api/smartwatches` | List all smartwatches |
+| GET | `/v2/api/smartwatches/{id}` | Get smartwatch by ID |
+| PUT | `/v2/api/smartwatches/{id}` | Update smartwatch |
+| DELETE | `/v2/api/smartwatches/{id}` | Deactivate smartwatch |
+| GET | `/v2/api/smartwatches/patient/{patientId}` | Smartwatches by patient |
+
+### Doctors — `DoctorController.java`
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/v2/api/doctors` | List doctors with professional data |
+| GET | `/v2/api/doctors/{id}` | Get doctor profile |
+| PUT | `/v2/api/doctors/{id}` | Update doctor professional data |
+
+### Health Metrics — `HealthMetricsController.java`
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/v2/api/health-metrics/patient/{patientId}` | Health metrics by patient (?days) |
+| GET | `/v2/api/health-metrics/patient/{patientId}/latest` | Latest metric for patient |
+| GET | `/v2/api/health-metrics/treatment/{treatmentId}` | Metrics by treatment |
+| POST | `/v2/api/health-metrics` | Ingest health metrics |
+| GET | `/v2/api/health-logs/patient/{patientId}` | Raw health logs (?days) |
+| GET | `/v2/api/radiation-logs/patient/{patientId}` | Radiation history (?days) |
+| GET | `/v2/api/radiation-logs/treatment/{treatmentId}` | Radiation by treatment |
+
+### Messages — `MessageController.java`
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/v2/api/messages/patient/{patientId}` | Messages for patient |
+| POST | `/v2/api/messages` | Send message to patient |
+| PUT | `/v2/api/messages/{id}/read` | Mark message as read |
+
+### Game Sessions — `GameController.java`
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/v2/api/games/patient/{patientId}` | Game sessions by patient |
+| POST | `/v2/api/games` | Record game session |
+
+### Settings — `SettingsController.java`
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/v2/api/settings/patient/{patientId}` | Patient preferences |
+| PUT | `/v2/api/settings/patient/{patientId}` | Update preferences |
+
+### Units — `UnitController.java`
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/v2/api/units` | List measurement units |
+| GET | `/v2/api/units/{id}` | Get unit by ID |
+
+### OAuth Clients — `OAuthClientController.java`
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/v2/api/oauth-clients` | List OAuth clients |
+| POST | `/v2/api/oauth-clients` | Create OAuth client |
+
+## Users CRUD (new)
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/v2/api/users/{id}` | Get user by ID |
+| PUT | `/v2/api/users/{id}` | Update user |
+| DELETE | `/v2/api/users/{id}` | Delete user |
+
+## Patients CRUD (new)
+| Method | Path | Description |
+|--------|------|-------------|
+| PUT | `/v2/api/patients/{id}` | Update patient |
+| DELETE | `/v2/api/patients/{id}` | Deactivate patient |
+
+> ✅ Patient endpoints now return full `PatientResponse` with phone, address, isActive, familyAccessCode, fkUserId, fkDoctorId, createdAt.
+> ✅ User model extended with `phone`, `licenseNumber`, `specialty` fields.
 
 ## Missing Endpoints
 
-35 endpoints identified across 7 categories. See `MISSING_ENDPOINTS.md` for full gap analysis with dependency diagram.
+All 35 missing endpoints from the initial analysis have been implemented. See `MISSING_ENDPOINTS.md` and `ENDPOINTS.md` for full details.
 
-**Entities without any controller:** `Smartwatch`, `HealthLog`, `RadiationLog`, `GameSession`, `MotivationalMessage`, `Settings`, `Unit`, `OAuthClient`.
+No entities remain without a controller — all 14 JPA entities now have at least one REST endpoint.
 
 ## Database
 
