@@ -4,7 +4,9 @@
 > **Fuente:** Análisis exhaustivo de cada componente del frontend (`radix-web/src/`) y cada controlador del backend (`radix-api/src/main/java/com/project/radix/Controller/`)
 > **Resultado:** 35 endpoints necesarios identificados
 > **Estado:** ✅ **Todos implementados** — Fase 1-5 completada (30 abril 2026)
-> **Endpoints implementados:** 64 REST + 3 WebSocket
+> **Endpoints implementados:** 66 REST + 3 WebSocket
+> **Adicional:** FileController (upload/download) implementado
+> **URL producción:** `https://api.raddix.pro/v1`
 
 ---
 

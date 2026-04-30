@@ -206,3 +206,29 @@ graph LR
     style ALT_E fill:#3b82f6,color:#fff
     style ISO_E fill:#3b82f6,color:#fff
 ```
+
+> **Estado (Abril 2026):** Todos los endpoints identificados en el análisis de brechas han sido implementados. 35 endpoints nuevos en 10 controladores. 14 entidades JPA con API REST. WebSocket para alerts, chat y Rix AI. File upload con volumen Docker persistente. Ver `ENDPOINTS.md` y `MISSING_ENDPOINTS.md`.
+
+---
+
+## 5. Configuración DNS Recomendada
+
+```mermaid
+graph LR
+    subgraph "dondominio"
+        A[raddix.pro] --> IP[132.145.194.97]
+        B[api.raddix.pro] --> IP
+        C[www.raddix.pro] --> A
+    end
+    
+    subgraph "Servidor (Traefik)"
+        IP --> WEB[radix-web :4321]
+        IP --> API[radix-api :9000]
+    end
+```
+
+| Tipo | Nombre | Valor |
+|------|--------|-------|
+| A | `@` | `132.145.194.97` |
+| A | `api` | `132.145.194.97` |
+| CNAME | `www` | `raddix.pro` |

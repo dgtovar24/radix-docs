@@ -30,7 +30,7 @@ npm run preview                     # preview production build
 `server.servlet.context-path=/v2` — all backend endpoints are under `/v2`.
 Frontend calls `https://api.raddix.pro/v2` (dev: `http://localhost:8080/v2`).
 
-## Complete Endpoint Inventory (64 REST + 3 WebSocket)
+## Complete Endpoint Inventory (66 REST + 3 WebSocket)
 
 ### Auth — `AuthController.java`
 | Method | Path | Description |
@@ -162,6 +162,12 @@ Frontend calls `https://api.raddix.pro/v2` (dev: `http://localhost:8080/v2`).
 | GET | `/v2/api/oauth-clients` | List OAuth clients |
 | POST | `/v2/api/oauth-clients` | Create OAuth client |
 
+### Files/Upload — `FileController.java`
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/v2/api/upload` | Upload file (multipart, 50MB limit) |
+| GET | `/v2/api/files/{filename}` | Serve uploaded file |
+
 ## Users CRUD (new)
 | Method | Path | Description |
 |--------|------|-------------|
@@ -184,36 +190,26 @@ All 35 missing endpoints from the initial analysis have been implemented. See `M
 
 No entities remain without a controller — all 14 JPA entities now have at least one REST endpoint.
 
-## Database
+## File Uploads
 
-- **Local**: H2 in-memory (`jdbc:h2:mem:radixdb`), schema auto-created via `ddl-auto: update`
-- **Production**: MySQL via env vars `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`; activated by `-Dspring.profiles.active=prod` (set in Dockerfile)
-- **Credentials in `application-prod.yml` are real and must not be committed**
+- **Endpoint:** `POST /v1/api/upload` (multipart, 50MB limit)
+- **Storage:** `/home/ubuntu/radix-uploads/` mounted as Docker volume on the API container
+- **Serving:** `GET /v1/api/files/{filename}` with auto-detected Content-Type
+- **Frontend:** `FileUpload.tsx` component (drag & drop + click, image preview)
 
-## Deployment
+## DNS Configuration
 
-- **API**: Dokploy with `radix-api/Dockerfile` (multi-stage `eclipse-temurin:21`). Env vars: `DB_HOST`, `DB_PORT`, `DB_NAME`, `DB_USER`, `DB_PASSWORD`, `SERVER_PORT`
-- **Web**: `radix-web/Dockerfile` (Bun builder + Node 22 runner)
-- See `radix-api/DEPLOY.md` for full env var table
+Domain: `raddix.pro` — Configure at dondominio:
 
-## Schema Source of Truth
+| Type | Name | Value | TTL |
+|------|------|-------|-----|
+| A | `@` | `132.145.194.97` | 3600 |
+| A | `api` | `132.145.194.97` | 3600 |
+| CNAME | `www` | `raddix.pro` | 3600 |
 
-JPA entities in `radix-api/src/main/java/com/project/radix/Model/` — schema auto-generated via `ddl-auto: update`. See `radix-api/DATABASE.md` for full table list (13 tables).
-
-## Sample Data
-
-Pre-loaded at startup via `radix-api/src/main/java/com/project/radix/Config/DataLoader.java` (1 admin user, 11 isotope catalog entries, auto-creates OAuth clients).
-
-## Documentation Files
-
-| File | Content |
-|------|---------|
-| `ENDPOINTS.md` | Complete catalog of all 29 existing API endpoints |
-| `MISSING_ENDPOINTS.md` | Gap analysis: 35 missing endpoints with Mermaid diagram |
-| `radix-api/DATABASE.md` | Full database schema with ERD and table definitions |
-| `radix-api/DEPLOY.md` | Deployment guide with env vars |
-| `radix-web/apiScheme.json` | Client-side API schema reference |
-| `diagrams.md` | Navigation and use case diagrams |
+Production URLs:
+- API: `https://api.raddix.pro/v1`
+- Web: `https://aiflex.dev` (to be migrated to `https://raddix.pro`)
 
 ## Frontend Architecture Notes
 

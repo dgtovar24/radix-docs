@@ -2,7 +2,7 @@
 
 > Context path: `/v2` (local) / `/v1` (production, vía `CONTEXT_PATH` env var)
 > Frontend proxy: `radix-web/src/pages/api/auth/*.ts` → `${PUBLIC_API_URL}/...`
-> Base URL frontend: `https://api.raddix.pro/v2` | Dev: `http://localhost:8080/v2`
+> Base URL: `https://api.raddix.pro/v1` | Dev: `http://localhost:8080/v2`
 
 ---
 
@@ -26,9 +26,10 @@
 | Units | 2 | `UnitController.java` |
 | OAuth Clients | 2 | `OAuthClientController.java` |
 | Dashboard | 1 | `DashboardController.java` |
+| Files/Upload | 2 | `FileController.java` |
 | System | 2 | `HealthController`, `DocsController` |
 | WebSocket | 3 | `WebSocketConfig.java` |
-| **Total REST** | **64** | |
+| **Total REST** | **66** | |
 | **Total WS** | **3** | |
 
 ---
@@ -824,18 +825,44 @@ Desactivar paciente (soft delete).
 
 ---
 
+## 19. Files/Upload — `FileController.java`
+
+### `POST /v1/api/upload`
+Subida de archivos (imágenes, PDFs). Acepta `multipart/form-data`.
+
+**Request:** `multipart/form-data` con campo `file`
+
+**Response `201`:**
+```json
+{
+  "url": "/api/files/a1b2c3d4.jpg",
+  "filename": "a1b2c3d4.jpg",
+  "originalName": "radiografia.jpg",
+  "size": 245760
+}
+```
+
+**Límite:** 50MB por archivo. Archivos guardados en `/home/ubuntu/radix-uploads/` con UUID como nombre.
+
+### `GET /v1/api/files/{filename}`
+Sirve archivos subidos. Content-Type detectado automáticamente.
+
+**Response `200`:** El archivo binario con headers Content-Type y Content-Disposition apropiados.
+
+**Componente frontend:** `FileUpload.tsx` — drag & drop + click, preview de imágenes.
+
+---
+
 ## Notas de Implementación
 
 1. **PatientResponse ampliado:** Ahora incluye todos los campos del modelo: `phone`, `address`, `isActive`, `familyAccessCode`, `fkUserId`, `fkDoctorId`, `createdAt`.
 
-2. **User model extendido:** Añadidos `phone`, `licenseNumber` y `specialty` para soportar el `UserRegistrationWizard`.
+2. **User model extendido:** Añadidos `phone`, `licenseNumber` y `specialty`.
 
-3. **AlertRepository duplicado:** `AlertRepository` y `DoctorAlertRepository` apuntan ambos a `DoctorAlert`. Solo `DoctorAlertRepository` se usa en producción.
+3. **Upload de archivos:** `FileController` con volumen Docker montado en `/home/ubuntu/radix-uploads/`.
 
-4. **Campos de doctor:** `licenseNumber` y `specialty` ahora existen en el modelo `User`. El `DoctorController` los expone.
+4. **35 endpoints implementados:** De los 35 endpoints faltantes, todos han sido implementados (Fases 1-5).
 
-5. **apiScheme.json actualizado:** Documenta los 64 endpoints REST + 3 WebSocket.
+5. **Dominio producción:** API en `https://api.raddix.pro/v1` (context-path `/v1`). Web en `https://aiflex.dev`.
 
-6. **35 endpoints implementados:** De los 35 endpoints faltantes identificados en `MISSING_ENDPOINTS.md`, todos han sido implementados en las Fases 1-5.
-
-7. **Entidades con API:** Todas las 14 entidades JPA tienen ahora al menos un endpoint REST.
+6. **Entidades con API:** Las 14 entidades JPA tienen al menos un endpoint REST.
