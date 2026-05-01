@@ -80,4 +80,16 @@
 
 ### P2-7: Eliminar `schema.sql` obsoleto
 **Archivo:** `radix-api/src/main/resources/schema.sql`
-**Problema:** Spring Boot intenta ejecutarlo al arrancar y falla (ya se desactivó con `spring.sql.init.mode=never`). Mejor eliminarlo o renombrarlo a `schema.sql.bak`.
+**Estado:** ✅ **Completado** — renombrado a `.bak` y luego eliminado. `spring.sql.init.mode=never` evita ejecución automática.
+
+---
+
+## Resumen Final
+
+| Nivel | Completado | Total | Items |
+|-------|-----------|-------|-------|
+| **P0** | 4/4 | 4 | BCrypt + JWT + admin + creds |
+| **P1** | 6/6 | 6 | HealthKit sync + push + pantallas + radix.pro + chat/rix + api.ts |
+| **P2** | 7/7 | 7 | Tests + validación + rate limit + docs + audit log + bg sync + schema.sql |
+
+**Proyecto completo.** 0 items pendientes.
