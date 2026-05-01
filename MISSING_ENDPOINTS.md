@@ -1,12 +1,41 @@
 # RADIX API — Endpoints Faltantes y Análisis de Brechas
 
-> **Fecha del análisis:** Abril 2026
+> **Fecha del análisis:** Mayo 2026
 > **Fuente:** Análisis exhaustivo de cada componente del frontend (`radix-web/src/`) y cada controlador del backend (`radix-api/src/main/java/com/project/radix/Controller/`)
-> **Resultado:** 35 endpoints necesarios identificados
-> **Estado:** ✅ **Todos implementados** — Fase 1-5 completada (30 abril 2026)
+> **Resultado histórico:** 35 endpoints necesarios identificados
+> **Estado actual:** Parcialmente implementado. El frontend ya consume la API
+> mediante `radix-web/src/pages/api/[...path].ts`; los mocks de dashboard se
+> sustituyen por respuestas reales o estados vacíos. Aún faltan endpoints para
+> configuración global, Rix persistente, chat interno persistente, departamentos
+> y métricas de facultativos.
 > **Endpoints implementados:** 66 REST + 3 WebSocket
 > **Adicional:** FileController (upload/download) implementado
 > **URL producción:** `https://api.raddix.pro/v1`
+
+---
+
+## Brechas activas para web
+
+Estas brechas son las que siguen impidiendo que algunas secciones de la web
+sean 100% persistentes en backend.
+
+| Área | Endpoint requerido | Uso en frontend |
+|------|--------------------|-----------------|
+| Configuración global | `GET /api/system-settings` | Cargar SMTP, Rix IA, seguridad, organización y notificaciones. |
+| Configuración global | `PUT /api/system-settings` | Guardar SMTP, Rix IA, seguridad, organización y notificaciones. |
+| SMTP | `POST /api/system-settings/smtp/test` | Enviar correo de prueba desde Configuración. |
+| Rix | `GET /api/rix/conversations` | Historial real de chats con Rix. |
+| Rix | `POST /api/rix/conversations/{id}/messages` | Enviar mensajes persistentes a Rix. |
+| Chat interno | `GET /api/internal-chat/conversations` | Lista de chats internos y grupales. |
+| Chat interno | `POST /api/internal-chat/conversations/{id}/messages` | Enviar mensajes internos persistentes. |
+| Departamentos | `GET /api/departments` | Filtro por departamento en Usuarios. |
+| Departamentos | `POST /api/departments` | Crear departamentos desde administración. |
+| Facultativos | `GET /api/facultativos/{id}/patients` | Pacientes asignados por facultativo. |
+| Facultativos | `GET /api/facultativos/{id}/metrics` | Gráficas administrativas por médico. |
+
+La sección **Configuración > Credenciales API** ya usa endpoints reales:
+`GET /api/oauth-clients`, `POST /api/oauth-clients`, y
+`POST /api/auth/token`.
 
 ---
 
@@ -20,15 +49,14 @@ graph TB
         TRAT[/tratamientos]
         ALERTA[/alertas]
         USR[/usuarios]
-        FAC[/facultativos]
         CONF[/configuracion]
         RIX[/rix]
     end
 
     subgraph "Frontend — Componentes React"
-        DW[DashboardWidgets<br/>mockDashboardData.ts]
+        DW[DashboardWidgets<br/>API dashboard/stats + health metrics]
         PL[PatientList]
-        PD[PatientDetails<br/>+ gráficos simulados]
+        PD[PatientDetails<br/>watch + health + radiation API]
         PF[PatientForm]
         PW[PatientRegistrationWizard<br/>4 pasos]
         TL[TreatmentList]
@@ -36,7 +64,7 @@ graph TB
         CC[ConfinementCalculator]
         AL[AlertList<br/>+ WebSocket]
         UL[UsuariosList]
-        FL[FacultativosList]
+        UL2[Usuarios<br/>facultativos integrados]
         UW[UserRegistrationWizard<br/>colegiado+especialidad]
         BP[BluetoothPairing]
         DL[DashboardLayout<br/>Chat interno + Rix]
@@ -136,7 +164,7 @@ graph TB
 | Prioridad | Significado | Cantidad |
 |-----------|-------------|----------|
 | **P0 — Crítico** | Componentes del frontend rotos sin estos endpoints | 8 |
-| **P1 — Alto** | Frontend usa mock data, necesita API real | 14 |
+| **P1 — Alto** | UI requiere persistencia adicional en backend | 14 |
 | **P2 — Medio** | Funcionalidad futura o de soporte | 13 |
 
 ---
@@ -374,9 +402,9 @@ Desactivar un paciente (soft delete: `isActive = false`).
 ## 5. Historial de Salud y Radiación (P1 — 6 endpoints)
 
 ### Componentes afectados
-- `DashboardWidgets.tsx` — **RadiationChartWidget** (usa `MOCK_RADIATION_LOGS`), **PatientActivityRadarWidget** (usa `MOCK_RADAR_DATA`)
-- `PatientDetails.tsx` — gráficos de **pasos**, **oxígeno (SpO2)**, **sueño** con `setInterval` simulado
-- `mockDashboardData.ts` — todos los datos son estáticos/hardcodeados
+- `DashboardWidgets.tsx` — **RadiationChartWidget** y **PatientActivityRadarWidget** consumen API real y muestran estado vacío/error si faltan datos.
+- `PatientDetails.tsx` — gráficos de **pasos**, **oxígeno (SpO2)**, **sueño** y radiación consumen endpoints de smartwatch, métricas y radiación.
+- La UI ya no mantiene `mockDashboardData.ts`; los datos clínicos deben venir de la API.
 
 ### Entidades existentes sin controlador
 - `HealthMetrics.java` — tabla `health_metrics`: `id`, `fkTreatmentId`, `fkPatientId`, `bpm`, `steps`, `distance`, `currentRadiation`, `recordedAt`
@@ -438,7 +466,7 @@ Historial de niveles de radiación de un paciente.
 ]
 ```
 
-**Propósito:** `DashboardWidgets.tsx` **RadiationChartWidget** — reemplazar `MOCK_RADIATION_LOGS`. `PatientDetails.tsx` — evolución de radiación.
+**Propósito:** `DashboardWidgets.tsx` **RadiationChartWidget** y `PatientDetails.tsx` — evolución de radiación con datos persistentes.
 
 ---
 
@@ -555,15 +583,40 @@ Preferencias del paciente: unidad de medida, tema, notificaciones.
 
 ---
 
-## 7. Chat y Rix AI (P2 — 3 endpoints)
+## 7. Chat y Rix AI (P2)
 
 ### Componentes afectados
-- `DashboardLayout.tsx` — **InternalChatPanel** (chat entre médicos con mensajes hardcodeados), **RixPanel** (asistente IA con historial y chats grupales)
+- `DashboardLayout.tsx` — **InternalChatPanel** consume directorio, conversaciones y mensajes desde API; **RixPanel** consume historial, grupos, médicos invitables y envío de prompts desde API.
 
 ### Estado actual
-Todo el chat es **puramente visual** — los mensajes son hardcodeados (`ChatMessage` con nombre, imagen, texto fijo). No hay backend que almacene ni enrute mensajes.
+El frontend ya no contiene conversaciones fijas. Si el backend no responde,
+muestra estados vacíos y documenta los endpoints faltantes.
 
 ### Endpoints necesarios
+
+#### `GET /v2/api/internal-chat/users`
+Directorio de usuarios disponibles para chat interno.
+
+#### `GET /v2/api/internal-chat/conversations?type=direct|group`
+Lista de chats directos y grupales.
+
+#### `GET /v2/api/internal-chat/conversations/{id}/messages`
+Mensajes de una conversación interna.
+
+#### `POST /v2/api/internal-chat/conversations/{id}/messages`
+Enviar un mensaje a una conversación interna.
+
+#### `GET /v2/api/rix/conversations`
+Historial de conversaciones con Rix.
+
+#### `GET /v2/api/rix/group-conversations`
+Sesiones grupales compartidas con médicos.
+
+#### `GET /v2/api/rix/doctors`
+Médicos invitables a una sesión grupal de Rix.
+
+#### `POST /v2/api/rix/messages`
+Enviar un prompt a Rix con invitados opcionales.
 
 #### `WS /ws/chat`
 WebSocket para chat interno entre facultativos.
@@ -579,7 +632,7 @@ WebSocket para chat interno entre facultativos.
 }
 ```
 
-**Propósito:** `InternalChatPanel` — chat en tiempo real entre médicos, reemplazar mensajes hardcodeados.
+**Propósito:** `InternalChatPanel` — chat en tiempo real entre médicos.
 
 ---
 
@@ -605,13 +658,6 @@ WebSocket para el asistente Rix AI.
 ```
 
 **Propósito:** `RixPanel` — asistente IA que conecta contexto de pacientes, tratamientos y alertas.
-
----
-
-#### `GET /v2/api/chat/history`
-Historial de conversaciones recientes del chat interno.
-
-**Propósito:** `RixPanel` lista de "Chats con Rix" y "Chats grupales".
 
 ---
 

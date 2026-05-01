@@ -65,8 +65,8 @@ ThemeProvider se incrusta dentro de DashboardLayout para que **compartan el mism
 
 ### Interfaz del Dashboard (Diseño Logip)
 
-- **Left Sidebar**: Logo (`logip`), navegación médica principal (Pacientes, Tratamientos, etc.) con iconos lucide-react y banner de "Upgrade to Pro".
-- **Right Sidebar**: Tarjeta de perfil detallada (Megan Norton con avatar) y un "Activity Feed" vertical con eventos de línea de tiempo y un input estilo píldora.
+- **Left Sidebar**: Logo Radix, navegación médica principal con iconos lucide-react, Chat interno, Rix y Mi perfil.
+- **Right Sidebar**: Chat interno y Rix con datos cargados desde `/api/internal-chat/*` y `/api/rix/*`; si faltan endpoints se muestran estados vacíos.
 
 ## DashboardStats
 

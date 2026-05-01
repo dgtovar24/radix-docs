@@ -504,18 +504,20 @@ sequenceDiagram
 
 ```http
 GET /dashboard HTTP/1.1
-Cookie: token=admin-hardcoded-token
+Cookie: radix-user={...}
 ```
 
 ### Authorization Header (API calls)
 
 ```http
 GET /api/users HTTP/1.1
-Authorization: Bearer admin-hardcoded-token
+Authorization: Bearer <token-or-user-id-from-radix-user-cookie>
 ```
 
-> [!warning] Inconsistencia
-> El middleware usa cookies para autenticación en el router de Astro, pero los fetch del frontend usan `Authorization` header. Esta doble estrategia puede causar confusión.
+> [!note]
+> El navegador solo conserva la cookie `radix-user`. El proxy Astro `/api/*`
+> extrae esa sesión y añade el header `Authorization` cuando reenvía la
+> solicitud al backend.
 
 ---
 

@@ -1,7 +1,9 @@
 # RADIX API v2 — Catálogo Completo de Endpoints
 
 > Context path: `/v2` (local) / `/v1` (production, vía `CONTEXT_PATH` env var)
-> Frontend proxy: `radix-web/src/pages/api/auth/*.ts` → `${PUBLIC_API_URL}/...`
+> Frontend proxy: `radix-web/src/pages/api/[...path].ts` forwards `/api/*`
+> requests to `${PUBLIC_API_URL}/api/*`. Auth routes keep dedicated session
+> handlers for cookie creation.
 > Base URL: `https://api.raddix.pro/v1` | Dev: `http://localhost:8080/v2`
 
 ---
@@ -245,7 +247,7 @@ Lista todos los usuarios registrados.
 ]
 ```
 
-**Frontend usage:** `UsuariosList.tsx:26` (llamada directa a backend), `api.ts:98`
+**Frontend usage:** `UsuariosList.tsx`, `ProfilePage`, `api.ts`.
 
 ---
 
@@ -254,7 +256,32 @@ Filtra usuarios por rol (`Doctor`, `Patient`, `Admin`).
 
 **Response `200`:** Mismo formato que `GET /users`.
 
-**Frontend usage:** `FacultativosList.tsx:26` (llamada directa), `api.ts:101`
+**Frontend usage:** `api.ts`.
+
+### `GET /v2/api/users/{id}`
+Obtiene un usuario por ID. Lo usa `/mi-perfil` para cargar la información
+editable del usuario conectado.
+
+### `PUT /v2/api/users/{id}`
+Actualiza datos de usuario. El frontend lo usa para editar perfil y resetear
+contraseña desde `/mi-perfil`.
+
+**Request Body parcial:**
+```json
+{
+  "firstName": "Admin",
+  "lastName": "Radix",
+  "email": "admin@radix.pro",
+  "phone": "+34 600 000 000",
+  "licenseNumber": "COL-12345",
+  "specialty": "Medicina nuclear",
+  "password": "new-secure-password"
+}
+```
+
+### `DELETE /v2/api/users/{id}`
+Elimina un usuario. La pantalla `/mi-perfil` no expone esta acción para evitar
+el borrado de la propia cuenta.
 
 ---
 
@@ -520,7 +547,7 @@ Estadísticas agregadas para el dashboard principal.
 }
 ```
 
-**Frontend usage:** `api.ts:169` (referenciado pero `DashboardWidgets.tsx` actualmente usa `MOCK_STATS`).
+**Frontend usage:** `radix-web/src/services/api.ts` y `DashboardWidgets.tsx` consumen este endpoint mediante el proxy local `/api/dashboard/stats`.
 
 ---
 
@@ -600,6 +627,21 @@ Chat interno entre facultativos.
 
 ---
 
+### Chat interno REST pendiente
+
+Estos endpoints están documentados porque el frontend ya los consume mediante
+`internalChat` en `radix-web/src/services/api.ts`; si el backend no responde, la
+UI muestra estado vacío.
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/v2/api/internal-chat/users` | Directorio de usuarios para iniciar chats. |
+| `GET` | `/v2/api/internal-chat/conversations?type=` | Lista de chats directos o grupales. |
+| `GET` | `/v2/api/internal-chat/conversations/{id}/messages` | Mensajes de una conversación interna. |
+| `POST` | `/v2/api/internal-chat/conversations/{id}/messages` | Enviar mensaje interno. |
+
+---
+
 ### `WS /ws/rix`
 Asistente Rix AI para consultas clínicas.
 
@@ -620,6 +662,21 @@ Asistente Rix AI para consultas clínicas.
 ```
 
 **Controlador:** `RixWebSocketHandler.java`
+
+---
+
+### Rix REST pendiente
+
+Estos endpoints están documentados porque el frontend ya los consume mediante
+`rix` en `radix-web/src/services/api.ts`; si el backend no responde, la UI
+muestra estado vacío.
+
+| Method | Path | Purpose |
+|--------|------|---------|
+| `GET` | `/v2/api/rix/conversations` | Historial de conversaciones con Rix. |
+| `GET` | `/v2/api/rix/group-conversations` | Sesiones grupales compartidas con médicos. |
+| `GET` | `/v2/api/rix/doctors` | Médicos invitables a chats grupales. |
+| `POST` | `/v2/api/rix/messages` | Enviar prompt a Rix con invitados opcionales. |
 
 ---
 
@@ -793,23 +850,25 @@ Una unidad.
 ## 18. OAuth Clients — `OAuthClientController.java`
 
 ### `GET /v2/api/oauth-clients`
-Listar clientes OAuth.
+Listar clientes OAuth. La sección **Configuración > Credenciales API** usa este
+endpoint para mostrar los clientes existentes.
 
 ### `POST /v2/api/oauth-clients`
 Crear nuevo cliente OAuth.
 
----
+**Request Body:**
+```json
+{
+  "clientId": "radix_xxxxxxxx",
+  "clientSecret": "secret",
+  "clientName": "Integración clínica",
+  "grantType": "client_credentials",
+  "scopes": "patients:read treatments:read alerts:write settings:write"
+}
+```
 
-## Users — Endpoints nuevos
-
-### `GET /v2/api/users/{id}`
-Obtener usuario por ID.
-
-### `PUT /v2/api/users/{id}`
-Actualizar datos de usuario (firstName, lastName, email, phone, licenseNumber, specialty, role).
-
-### `DELETE /v2/api/users/{id}`
-Eliminar usuario.
+Para generar token se usa `POST /v2/api/auth/token` con las mismas
+credenciales.
 
 ---
 

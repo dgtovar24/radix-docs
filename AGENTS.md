@@ -55,8 +55,12 @@ Frontend calls `https://api.raddix.pro/v2` (dev: `http://localhost:8080/v2`).
 |--------|------|-------------|
 | GET | `/v2/api/users` | List all users |
 | GET | `/v2/api/users/role/{role}` | List users by role |
+| GET | `/v2/api/users/{id}` | Get user by ID |
+| PUT | `/v2/api/users/{id}` | Update user/profile fields and password |
+| DELETE | `/v2/api/users/{id}` | Delete user |
 
-> ⚠️ **Missing:** No GET/PUT/DELETE for individual users. No `phone`, `licenseNumber`, `specialty` fields on User model.
+> `User` includes `phone`, `licenseNumber`, and `specialty`. The web profile
+> page uses GET/PUT user endpoints and does not expose self-delete.
 
 ### Treatments — `TreatmentController.java`
 | Method | Path | Description |
@@ -186,9 +190,10 @@ Frontend calls `https://api.raddix.pro/v2` (dev: `http://localhost:8080/v2`).
 
 ## Missing Endpoints
 
-All 35 missing endpoints from the initial analysis have been implemented. See `MISSING_ENDPOINTS.md` and `ENDPOINTS.md` for full details.
-
-No entities remain without a controller — all 14 JPA entities now have at least one REST endpoint.
+Most initial gaps have been implemented. Active web gaps remain for global
+system settings, persistent Rix conversations, persistent internal chat,
+departments, patient assignments, and facultativo metrics. See
+`MISSING_ENDPOINTS.md` for the current gap list.
 
 ## File Uploads
 
@@ -232,11 +237,15 @@ Production URLs:
 ### Page Structure
 - `/dashboard` — 3 islands: ThemeProvider, DashboardLayout, DashboardStats
 - `/configuracion` — 1 island: DashboardLayout with `configPage="configuration"`
+- `/mi-perfil` — DashboardLayout profile view, loads/saves through `/api/users/{id}`
 - Auth via `radix-user` cookie (JSON encoded), checked by middleware
 
-### Mock Data
-- Dashboard widgets (`DashboardWidgets.tsx`) use `MOCK_STATS`, `MOCK_RADIATION_LOGS`, `MOCK_ISOTOPE_DISTRIBUTION`, `MOCK_ALERTS_DATA`, `MOCK_RADAR_DATA`, `MOCK_PATIENTS_LIST` from `mockDashboardData.ts`
-- Patient details use `setInterval` simulated heart rate and `useMemo` generated historical data
-- Chat panel uses hardcoded messages (Floyd Miles, Guy Hawkins, Kristin Watson)
-- Rix panel uses hardcoded chat history and doctor list
-- All mock data should be replaced with real API calls once missing endpoints are implemented
+### API Data Policy
+- React components should consume `radix-web/src/services/api.ts`.
+- General `/api/*` calls are proxied by `radix-web/src/pages/api/[...path].ts`
+  to `${PUBLIC_API_URL}/api/*`.
+- New web features must use backend data. If an endpoint is missing, render an
+  empty/error state and document the missing endpoint instead of adding mock
+  datasets.
+- Browser-only UI preferences such as palette and sidebar open/closed state may
+  remain in `localStorage`.

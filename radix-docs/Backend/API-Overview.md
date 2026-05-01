@@ -29,7 +29,7 @@ alerts, health metrics, smartwatches, messages, and catalog data.
 | Local base URL | `http://localhost:8080/v2` |
 | Context path | `/v2` |
 | Format | JSON |
-| Authentication | Mock token based on user ID or hardcoded admin token |
+| Authentication | Mock token based on user ID or OAuth client token |
 
 ## Current endpoints
 
@@ -58,7 +58,7 @@ Facultativos page is removed from the web app.
 | `GET` | `/api/users` | Lists all users. |
 | `GET` | `/api/users/role/{role}` | Lists users filtered by role. |
 | `GET` | `/api/users/{id}` | Gets a user by ID. |
-| `PUT` | `/api/users/{id}` | Updates editable user fields. |
+| `PUT` | `/api/users/{id}` | Updates editable user fields, including password reset. |
 | `DELETE` | `/api/users/{id}` | Deletes a user. |
 | `GET` | `/api/doctors` | Lists users with doctor/facultativo role. |
 | `GET` | `/api/doctors/{id}` | Gets a doctor/facultativo by ID. |
@@ -143,6 +143,8 @@ settings, and motivational game sessions.
 | `GET` | `/api/units/{id}` | Gets a unit by ID. |
 | `GET` | `/api/settings/patient/{patientId}` | Gets patient settings. |
 | `PUT` | `/api/settings/patient/{patientId}` | Updates patient settings. |
+| `GET` | `/api/oauth-clients` | Lists OAuth/API clients. |
+| `POST` | `/api/oauth-clients` | Creates an OAuth/API client. |
 | `GET` | `/api/games/patient/{patientId}` | Lists patient game sessions. |
 | `POST` | `/api/games` | Creates a game session. |
 | `GET` | `/api/dashboard/stats` | Gets dashboard summary stats. |
@@ -159,11 +161,27 @@ values to these names when the production authorization layer is implemented.
 - `FACULTATIVO`: clinical user with patients, treatments, alerts, and optional
   department membership.
 
+## Frontend API dependency notes
+
+The web app now uses the frontend proxy at `radix-web/src/pages/api/[...path].ts`
+for general API calls. React components call `/api/*`, and the proxy forwards
+requests to `${PUBLIC_API_URL}/api/*`.
+
+The `/mi-perfil` page depends on `GET /api/users/{id}` and
+`PUT /api/users/{id}`. It exposes profile editing and password reset, but it
+does not expose self-service account deletion.
+
+The configuration page uses `GET /api/oauth-clients`, `POST /api/oauth-clients`,
+and `POST /api/auth/token` for **Credenciales API**. It also calls
+`GET /api/system-settings`, `PUT /api/system-settings`, and
+`POST /api/system-settings/smtp/test` for SMTP, Rix IA model, security,
+organization, notifications, integrations, and data retention settings.
+
 ## Missing endpoints required by the current frontend
 
-The current UI models departments, user filtering, facultativo metrics, and
-patient assignments with mock data. These endpoints are still missing from the
-backend.
+The current UI consumes real API data through the Astro `/api/*` proxy. These
+endpoints are still missing from the backend for server-side department
+filtering, facultativo assignments, and admin-only clinical staff charts.
 
 ```mermaid
 flowchart LR
@@ -194,5 +212,5 @@ flowchart LR
 
 ## Next steps
 
-Implement departments and facultativo metrics in the backend before replacing
-the frontend mock data on the users page.
+Implement departments, patient assignments, and facultativo metrics in the
+backend so the Users page can persist all admin changes server-side.

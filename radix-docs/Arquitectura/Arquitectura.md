@@ -141,7 +141,9 @@ Treatment (1) ─< RadiationLog (N)
 
 El sistema usa un modelo de token simplificado:
 - El token es el ID del usuario (mock)
-- El admin tiene token hardcoded: `admin-hardcoded-token`
+- El backend histórico conserva compatibilidad con `admin-hardcoded-token`,
+  pero el frontend ya no crea sesiones hardcoded; usa login real y la cookie
+  `radix-user`.
 
 ### Roles
 

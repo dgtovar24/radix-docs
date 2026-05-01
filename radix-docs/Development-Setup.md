@@ -130,7 +130,8 @@ npm run dev
 | `http://localhost:4321` | Página principal (redirect a /login) |
 | `http://localhost:4321/login` | Login |
 | `http://localhost:4321/dashboard` | Dashboard |
-| `http://localhost:4321/facultativos` | Lista de doctores |
+| `http://localhost:4321/usuarios` | Usuarios y facultativos |
+| `http://localhost:4321/mi-perfil` | Perfil del usuario actual |
 | `http://localhost:4321/configuracion` | Configuración |
 
 ### Configuración de API

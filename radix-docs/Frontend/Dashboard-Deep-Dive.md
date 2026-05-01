@@ -85,10 +85,9 @@ Layout usa CSS Grid con 3 columnas fijas:
 ### Right Sidebar / Activity Feed (340px)
 
 - **Fondo opaco** (`var(--sf)`) sobre el borde gris.
-- **Profile Card**: Tarjeta flotante gris claro (`var(--b)`) con avatar centrado, nombre (Megan Norton), handle, y 3 FABs (Phone, Video, MoreVertical).
-- **Activity Feed**: Timeline de eventos recientes con avatares (Pravatar).
-  - Comentarios sobre proyectos con contenedores de borde redondeado.
-  - Adjuntos de archivos (ej. Figma `.fig`) con peso de archivo y botón de descarga.
+- **Chat interno**: Directorio de usuarios, chats directos, chats grupales y mensajes cargados desde `/api/internal-chat/*`.
+- **Rix**: Historial, grupos, médicos invitados y envío de prompts cargados desde `/api/rix/*`.
+- Si el backend todavía no expone estos endpoints, la columna muestra estados vacíos en vez de datos inventados.
 - **Message Input**: Input píldora en la base con botones de adjunto (Paperclip), Smile y Micrófono.
 
 ## Navegación

@@ -34,13 +34,27 @@ status: active
 src/pages/
 ├── login.astro         → LoginForm en AuthLayout
 ├── register.astro      → RegisterForm
-├── dashboard.astro     → Dashboard principal (KPIs, chart, tasks)
-└── configuracion.astro → ConfigurationPage (selector de paletas)
+├── dashboard.astro     → Dashboard principal
+├── pacientes/          → Listado, alta, y detalle de pacientes
+├── tratamientos/       → Listado y alta de tratamientos
+├── alertas/            → Alertas clínicas
+├── usuarios.astro      → Usuarios y facultativos
+├── mi-perfil.astro     → Perfil editable del usuario conectado
+├── rix.astro           → Vista expandida de Rix
+└── configuracion.astro → Centro de configuración
 ```
 
 ## API Context Path
 
-`server.servlet.context-path=/v2` — frontend llama a `http://localhost:8080/v2` (dev) o `https://api.raddix.pro/v2` (producción).
+`server.servlet.context-path=/v2` — frontend llama a
+`http://localhost:8080/v2` (dev) o `https://api.raddix.pro/v2`
+(producción).
+
+El cliente React consume `/api/*`. Astro sirve un proxy general en
+`src/pages/api/[...path].ts` que reenvía esas llamadas a
+`${PUBLIC_API_URL}/api/*` y adjunta el token de la cookie `radix-user` cuando
+existe. Las rutas de autenticación mantienen handlers dedicados para crear y
+borrar la cookie de sesión.
 
 ## CSS Variables
 
@@ -71,10 +85,11 @@ El sistema de temas usa CSS custom properties aplicadas al `:root` para personal
 
 | Componente | Archivo | Descripción |
 |------------|---------|-------------|
-| DashboardLayout | `DashboardLayout.tsx` | Layout 3-columnas con navegación médica y Activity Feed |
-| DashboardStats | `DashboardStats.tsx` | KPIs, gráfico de rendimiento, lista de tareas |
+| DashboardLayout | `DashboardLayout.tsx` | Layout 3-columnas; chat interno y Rix consumen API y muestran estados vacíos si faltan endpoints |
+| DashboardStats | `DashboardStats.tsx` | KPIs y gráficos con datos de API |
 | ThemeProvider | `ThemeProvider.tsx` | Contexto de paleta, CSS variables, localStorage |
-| ConfigurationPage | `ConfigurationPage.tsx` | Selector de paletas, color pickers |
+| ConfigurationPage | `ConfigurationPage.tsx` | Configuración API-first: `/api/system-settings`, SMTP test, Rix IA, credenciales API |
+| ProfilePage | `DashboardLayout.tsx` | Perfil editable y reset de contraseña |
 | LoginForm | `LoginForm.tsx` | Formulario de login |
 
 ## Astro Islands
@@ -109,7 +124,10 @@ Cookie `radix-user` con JSON encodeado:
 
 - Middleware redirige a `/login` si no hay cookie
 - Rutas públicas: `/login`, `/register`, `/api/auth/*`
-- Sin JWT — la cookie actúa como sesión simple
+- El proxy `/api/*` usa `token` o `id` de la cookie como bearer-like token.
+- El login del frontend ya no crea usuarios hardcoded; siempre consulta la API.
+- Chat interno y Rix ya no contienen conversaciones fijas; consultan
+  `/api/internal-chat/*` y `/api/rix/*`.
 
 ## Paletas
 
