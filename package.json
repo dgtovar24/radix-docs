@@ -2,5 +2,26 @@
   "devDependencies": {
     "@playwright/test": "^1.59.1",
     "playwright": "^1.59.1"
-  }
+  },
+  "name": "radix",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "playwright-core": "^1.59.1"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dgtovar24/radix-docs.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dgtovar24/radix-docs/issues"
+  },
+  "homepage": "https://github.com/dgtovar24/radix-docs#readme"
 }
